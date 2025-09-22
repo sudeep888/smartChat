@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Smart Chat</title>
+<title>Smart Chat — Elegant UI</title>
 <style>
 /* ---------- Theme variables ---------- */
 :root{
@@ -57,6 +57,8 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial
 .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:none;cursor:pointer;background:transparent;color:var(--text);outline:none;font-weight:600}
 .btn.full{width:100%;text-align:left;padding:12px 14px;border-radius:14px;border:1px solid rgba(0,0,0,0.06);background:transparent;color:var(--text)}
 .btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted)}
+.btn.primary{background:var(--button-bg);color:white;box-shadow:var(--button-shadow);transition:transform .12s ease}
+.btn.primary:hover{transform:translateY(-2px)}
 .btn:focus{outline:3px solid rgba(99,102,241,0.12);outline-offset:3px}
 
 /* Controls row */
@@ -64,7 +66,7 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial
 
 /* ---------- Theme toggle ---------- */
 .toggle { display:inline-flex; align-items:center; gap:12px; cursor:pointer; user-select:none; }
-.toggle input[type="checkbox"]{ position:absolute; left:-9999px; }
+.toggle input[type="checkbox"]{ position:absolute; left:-9999px; } /* hidden */
 .toggle-pill { display:inline-flex; align-items:center; justify-content:center; width:62px; height:36px; border-radius:999px; padding:6px; background:var(--toggle-bg); border:1px solid var(--toggle-border); transition:background .18s ease, border .18s ease; box-shadow: 0 4px 14px rgba(2,6,23,0.06);}
 .toggle-icons { width:100%; display:flex; align-items:center; justify-content:space-between; padding: 0 6px; }
 .toggle-icons svg{ width:18px; height:18px; fill:var(--toggle-icon); transition:fill .18s ease, transform .18s ease; }
@@ -99,17 +101,26 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial
 .small{font-size:12px;color:var(--muted)}
 .hint{font-size:13px;color:var(--muted);margin-top:6px}
 
-/* responsive */
+/* ---------- Responsive: place chat first on mobile ---------- */
 @media (max-width:880px){
-  .panel{grid-template-columns:1fr;max-width:720px}
-  .side{order:2}
-  .chat-area{height:74vh}
+  .panel{
+    grid-template-columns:1fr;   /* single column */
+    max-width:720px;
+  }
+  .chat-area{
+    order:2;       /* chat first */
+    height:74vh;
+  }
+  .side{
+    order:1;       /* sidebar second */
+  }
 }
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="panel">
+  <div class="panel" id="panel">
+    <!-- SIDE / CONTROLS -->
     <div class="side">
       <div class="brand">
         <div class="logo">AI</div>
@@ -120,29 +131,38 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial
       </div>
 
       <div class="controls">
+        <!-- Clear chat -->
         <button class="btn full ghost" id="clearBtn" type="button">Clear chat</button>
 
+        <!-- Theme toggle -->
         <div class="controls-row">
           <label class="toggle" for="themeCheckbox">
-            <input id="themeCheckbox" type="checkbox" aria-label="Toggle theme" />
+            <input type="checkbox" id="themeCheckbox" style="display:none" />
             <span class="toggle-pill" aria-hidden="true">
               <span class="toggle-icons" aria-hidden="true">
-                <svg class="sun" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.79 1.8-1.79zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.03 1.05l1.79-1.79-1.79-1.79-1.79 1.79 1.79 1.79zM17.24 19.16l1.79 1.79 1.79-1.79-1.79-1.79-1.79 1.79zM20 11v2h3v-2h-3zM12 7a5 5 0 100 10 5 5 0 000-10zm-1 13h2v-3h-2v3zM4.24 19.16l1.8 1.79 1.79-1.79-1.79-1.79-1.8 1.79z"/></svg>
-                <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                <!-- Sun icon -->
+                <svg class="sun" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.79 1.8-1.79zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.03 1.05l1.79-1.79-1.79-1.79-1.79 1.79 1.79 1.79zM17.24 19.16l1.79 1.79 1.79-1.79-1.79-1.79-1.79 1.79zM20 11v2h3v-2h-3zM12 7a5 5 0 100 10 5 5 0 000-10zm-1 13h2v-3h-2v3zM4.24 19.16l1.8 1.79 1.79-1.79-1.79-1.79-1.8 1.79z"/>
+                </svg>
+                <!-- Moon icon -->
+                <svg class="moon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                </svg>
               </span>
             </span>
             <span class="toggle-label">Theme</span>
           </label>
         </div>
 
-        <div class="hint small">Use short prompts for quick answers or provide context for detailed help.</div>
+        <div class="hint">Use short prompts for quick answers or provide context for detailed help.</div>
       </div>
     </div>
 
-    <div class="chat-area">
+    <!-- CHAT AREA -->
+    <div class="chat-area" role="main" aria-live="polite">
       <div class="header">
         <div style="display:flex;align-items:center;gap:10px">
-          <!-- Back to simple gradient square logo -->
+          <!-- Gradient square logo -->
           <div class="avatar">B</div>
           <div class="meta">Chat with the assistant — <span class="small">Responses powered by OpenAI</span></div>
         </div>
@@ -164,46 +184,80 @@ html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial
 </div>
 
 <script>
-const messagesEl=document.getElementById('messages');
-const inputEl=document.getElementById('input');
-const sendBtn=document.getElementById('send');
-const clearBtn=document.getElementById('clearBtn');
-const themeCheckbox=document.getElementById('themeCheckbox');
+// ---------- Script ----------
+const messagesEl = document.getElementById('messages');
+const inputEl = document.getElementById('input');
+const sendBtn = document.getElementById('send');
+const clearBtn = document.getElementById('clearBtn');
+const themeCheckbox = document.getElementById('themeCheckbox');
 
+// apply theme; light=true means light mode
 function applyTheme(light){
-  if(light){document.documentElement.classList.add('light');localStorage.setItem('chat_theme','light');themeCheckbox.checked=true;}
-  else{document.documentElement.classList.remove('light');localStorage.setItem('chat_theme','dark');themeCheckbox.checked=false;}
+  if(light){
+    document.documentElement.classList.add('light');
+    localStorage.setItem('chat_theme','light');
+    themeCheckbox.checked = true;
+  } else {
+    document.documentElement.classList.remove('light');
+    localStorage.setItem('chat_theme','dark');
+    themeCheckbox.checked = false;
+  }
 }
-const saved=localStorage.getItem('chat_theme');
-applyTheme(saved==='light');
-themeCheckbox.addEventListener('change',()=>applyTheme(themeCheckbox.checked));
-clearBtn.addEventListener('click',()=>{messagesEl.innerHTML='';});
+const saved = localStorage.getItem('chat_theme');
+applyTheme(saved === 'light');
 
-function renderMessage(role,text){
-  const d=document.createElement('div');
-  d.className='message '+(role==='user'?'msg-user':'msg-assistant');
-  d.textContent=text;
-  messagesEl.appendChild(d);
-  messagesEl.scrollTop=messagesEl.scrollHeight;
+// toggle via checkbox change
+themeCheckbox.addEventListener('change', ()=>{
+  applyTheme(themeCheckbox.checked);
+});
+
+// clear chat
+clearBtn.addEventListener('click', ()=>{
+  messagesEl.innerHTML = '';
+});
+
+// render messages
+function renderMessage(role, text){
+  const el = document.createElement('div');
+  el.className = 'message ' + (role === 'user' ? 'msg-user' : 'msg-assistant');
+  el.textContent = text;
+  messagesEl.appendChild(el);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 }
+
+// send message
 async function sendMessage(){
-  const text=inputEl.value.trim();
+  const text = inputEl.value.trim();
   if(!text) return;
-  renderMessage('user',text);
-  inputEl.value='';
-  sendBtn.disabled=true;
-  document.getElementById('typingIndicator').style.visibility='visible';
+  renderMessage('user', text);
+  inputEl.value = '';
+  sendBtn.disabled = true;
+  document.getElementById('typingIndicator').style.visibility = 'visible';
   try{
-    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:text}]})});
-    if(!r.ok){const t=await r.text();renderMessage('assistant','Error: '+t);return;}
-    const data=await r.json();
-    const assistant=(data.choices&&data.choices[0]&&(data.choices[0].message?.content||data.choices[0].text))||'No response';
-    renderMessage('assistant',assistant);
-  }catch(e){renderMessage('assistant','Network error: '+(e.message||e));}
-  finally{sendBtn.disabled=false;document.getElementById('typingIndicator').style.visibility='hidden';inputEl.focus();}
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: [{ role: 'user', content: text }] })
+    });
+    if(!resp.ok){
+      const t = await resp.text();
+      renderMessage('assistant', 'Error: ' + t);
+      return;
+    }
+    const data = await resp.json();
+    const assistant = (data.choices && data.choices[0] && (data.choices[0].message?.content || data.choices[0].text)) || 'No response';
+    renderMessage('assistant', assistant);
+  }catch(e){
+    renderMessage('assistant', 'Network error: ' + (e.message || e));
+  }finally{
+    sendBtn.disabled = false;
+    document.getElementById('typingIndicator').style.visibility = 'hidden';
+    inputEl.focus();
+  }
 }
-sendBtn.addEventListener('click',sendMessage);
-inputEl.addEventListener('keydown',(e)=>{if(e.key==='Enter')sendMessage();});
+
+sendBtn.addEventListener('click', sendMessage);
+inputEl.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') sendMessage(); });
 inputEl.focus();
 </script>
 </body>
