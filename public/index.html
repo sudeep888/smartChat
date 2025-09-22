@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Smart Chat</title>
+<style>
+/* ---------- Theme variables ---------- */
+:root{
+  --bg:#0f1724;
+  --card:#0b1220;
+  --muted:#94a3b8;
+  --text:#e6eef8;
+  --accent:#7c3aed;
+  --accent-2:#06b6d4;
+  --glass: rgba(255,255,255,0.04);
+  --bubble-user: linear-gradient(135deg,#05606a,#0ea5a4);
+  --bubble-assistant: linear-gradient(135deg,#1e293b,#0f1724);
+  --button-bg: linear-gradient(90deg,var(--accent),var(--accent-2));
+  --button-shadow: 0 10px 30px rgba(12,10,40,0.18);
+  --soft-shadow: 0 10px 28px rgba(2,6,23,0.5);
+  --toggle-bg: rgba(255,255,255,0.03);
+  --toggle-border: rgba(255,255,255,0.06);
+  --toggle-icon: #cbd5e1;
+}
+:root.light{
+  --bg: #f6f8fb;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --text: #0f1724;
+  --accent:#5b21b6;
+  --accent-2:#0ea5a4;
+  --glass: rgba(15,23,42,0.02);
+  --bubble-user: linear-gradient(135deg,#60a5fa,#3b82f6);
+  --bubble-assistant: linear-gradient(135deg,#f1f5f9,#e6eef8);
+  --button-bg: linear-gradient(180deg, rgba(91,33,182,0.95), rgba(14,165,164,0.95));
+  --button-shadow: 0 8px 20px rgba(14,165,164,0.12);
+  --soft-shadow: 0 10px 28px rgba(15,23,42,0.06);
+  --toggle-bg: rgba(15,23,42,0.04);
+  --toggle-border: rgba(15,23,42,0.08);
+  --toggle-icon: #0f1724;
+}
+
+/* ---------- Base ---------- */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+.container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+.panel{width:100%;max-width:980px;border-radius:16px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:var(--soft-shadow);backdrop-filter:blur(6px);border:1px solid rgba(0,0,0,0.04);display:grid;grid-template-columns:320px 1fr;gap:18px}
+.panel .side{padding:14px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:10px;background:var(--button-bg);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px;box-shadow:var(--button-shadow)}
+.title{font-size:18px;color:var(--text);font-weight:600}
+.shrink{font-size:12px;color:var(--muted)}
+.side .controls{margin-top:18px;display:flex;flex-direction:column;gap:12px;align-items:stretch}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:none;cursor:pointer;background:transparent;color:var(--text);outline:none;font-weight:600}
+.btn.full{width:100%;text-align:left;padding:12px 14px;border-radius:14px;border:1px solid rgba(0,0,0,0.06);background:transparent;color:var(--text)}
+.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--muted)}
+.btn:focus{outline:3px solid rgba(99,102,241,0.12);outline-offset:3px}
+
+/* Controls row */
+.controls-row{display:flex;gap:12px;align-items:center;justify-content:flex-start}
+
+/* ---------- Theme toggle ---------- */
+.toggle { display:inline-flex; align-items:center; gap:12px; cursor:pointer; user-select:none; }
+.toggle input[type="checkbox"]{ position:absolute; left:-9999px; }
+.toggle-pill { display:inline-flex; align-items:center; justify-content:center; width:62px; height:36px; border-radius:999px; padding:6px; background:var(--toggle-bg); border:1px solid var(--toggle-border); transition:background .18s ease, border .18s ease; box-shadow: 0 4px 14px rgba(2,6,23,0.06);}
+.toggle-icons { width:100%; display:flex; align-items:center; justify-content:space-between; padding: 0 6px; }
+.toggle-icons svg{ width:18px; height:18px; fill:var(--toggle-icon); transition:fill .18s ease, transform .18s ease; }
+:root.light .toggle-icons svg.sun { transform: scale(1.05); fill: var(--accent); }
+:root.light .toggle-icons svg.moon { fill: var(--toggle-icon); opacity:0.6; }
+:root:not(.light) .toggle-icons svg.moon { transform: scale(1.05); fill: var(--accent-2); }
+:root:not(.light) .toggle-icons svg.sun { fill: var(--toggle-icon); opacity:0.6; }
+.toggle-label { font-weight:700; color:var(--text); font-size:13px; }
+
+/* ---------- Chat area ---------- */
+.chat-area{display:flex;flex-direction:column;height:640px;background:var(--card);border-radius:12px;padding:12px;border:1px solid rgba(0,0,0,0.04);overflow:hidden}
+.header{display:flex;align-items:center;gap:12px;padding:8px 12px}
+.header .meta{font-size:14px;color:var(--muted)}
+.messages{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.message{max-width:78%;padding:12px 14px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.06);opacity:0;transform:translateY(8px);animation:fadeUp .28s ease forwards;font-size:15px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+@keyframes fadeUp{to{opacity:1;transform:none}}
+.msg-user{margin-left:auto;background:var(--bubble-user);color:#fff;box-shadow:0 10px 30px rgba(16,24,40,0.12);border-bottom-right-radius:6px}
+.msg-assistant{margin-right:auto;background:var(--bubble-assistant);color:var(--text);box-shadow:0 8px 18px rgba(2,6,23,0.06);border-bottom-left-radius:6px}
+
+/* Avatar (header logo style) */
+.avatar{width:40px;height:40px;border-radius:10px;background:var(--button-bg);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;box-shadow:var(--button-shadow)}
+
+/* Input */
+.input-row{display:flex;gap:10px;padding:12px;border-top:1px solid rgba(0,0,0,0.04);align-items:center;background:transparent}
+.input{flex:1;background:var(--glass);border-radius:12px;padding:12px;border:1px solid rgba(0,0,0,0.06);outline:none;color:var(--text);font-size:15px}
+.input::placeholder{color:var(--muted)}
+.send{background:var(--button-bg);border:none;padding:10px 14px;border-radius:10px;color:white;cursor:pointer;box-shadow:var(--button-shadow);font-weight:700;letter-spacing:0.2px;transition:transform .12s ease}
+.send:hover{transform:translateY(-2px)}
+.send:disabled{opacity:0.6;transform:none;box-shadow:none}
+
+/* small */
+.small{font-size:12px;color:var(--muted)}
+.hint{font-size:13px;color:var(--muted);margin-top:6px}
+
+/* responsive */
+@media (max-width:880px){
+  .panel{grid-template-columns:1fr;max-width:720px}
+  .side{order:2}
+  .chat-area{height:74vh}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="panel">
+    <div class="side">
+      <div class="brand">
+        <div class="logo">AI</div>
+        <div>
+          <div class="title">Smart Chat</div>
+          <div class="shrink">Fast • Private • Simple</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn full ghost" id="clearBtn" type="button">Clear chat</button>
+
+        <div class="controls-row">
+          <label class="toggle" for="themeCheckbox">
+            <input id="themeCheckbox" type="checkbox" aria-label="Toggle theme" />
+            <span class="toggle-pill" aria-hidden="true">
+              <span class="toggle-icons" aria-hidden="true">
+                <svg class="sun" viewBox="0 0 24 24"><path d="M6.76 4.84l-1.8-1.79L3.17 4.84l1.79 1.79 1.8-1.79zM1 13h3v-2H1v2zm10-9h2V1h-2v3zm7.03 1.05l1.79-1.79-1.79-1.79-1.79 1.79 1.79 1.79zM17.24 19.16l1.79 1.79 1.79-1.79-1.79-1.79-1.79 1.79zM20 11v2h3v-2h-3zM12 7a5 5 0 100 10 5 5 0 000-10zm-1 13h2v-3h-2v3zM4.24 19.16l1.8 1.79 1.79-1.79-1.79-1.79-1.8 1.79z"/></svg>
+                <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+              </span>
+            </span>
+            <span class="toggle-label">Theme</span>
+          </label>
+        </div>
+
+        <div class="hint small">Use short prompts for quick answers or provide context for detailed help.</div>
+      </div>
+    </div>
+
+    <div class="chat-area">
+      <div class="header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <!-- Back to simple gradient square logo -->
+          <div class="avatar">B</div>
+          <div class="meta">Chat with the assistant — <span class="small">Responses powered by OpenAI</span></div>
+        </div>
+      </div>
+
+      <div id="messages" class="messages"></div>
+
+      <div class="input-row">
+        <input id="input" class="input" placeholder="Ask anything — press Enter or Send" autocomplete="off" />
+        <button id="send" class="send">Send</button>
+      </div>
+
+      <div class="footer">
+        <div class="typing small" id="typingIndicator" style="visibility:hidden">Assistant is typing…</div>
+        <div class="small">Theme saved locally</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const messagesEl=document.getElementById('messages');
+const inputEl=document.getElementById('input');
+const sendBtn=document.getElementById('send');
+const clearBtn=document.getElementById('clearBtn');
+const themeCheckbox=document.getElementById('themeCheckbox');
+
+function applyTheme(light){
+  if(light){document.documentElement.classList.add('light');localStorage.setItem('chat_theme','light');themeCheckbox.checked=true;}
+  else{document.documentElement.classList.remove('light');localStorage.setItem('chat_theme','dark');themeCheckbox.checked=false;}
+}
+const saved=localStorage.getItem('chat_theme');
+applyTheme(saved==='light');
+themeCheckbox.addEventListener('change',()=>applyTheme(themeCheckbox.checked));
+clearBtn.addEventListener('click',()=>{messagesEl.innerHTML='';});
+
+function renderMessage(role,text){
+  const d=document.createElement('div');
+  d.className='message '+(role==='user'?'msg-user':'msg-assistant');
+  d.textContent=text;
+  messagesEl.appendChild(d);
+  messagesEl.scrollTop=messagesEl.scrollHeight;
+}
+async function sendMessage(){
+  const text=inputEl.value.trim();
+  if(!text) return;
+  renderMessage('user',text);
+  inputEl.value='';
+  sendBtn.disabled=true;
+  document.getElementById('typingIndicator').style.visibility='visible';
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:text}]})});
+    if(!r.ok){const t=await r.text();renderMessage('assistant','Error: '+t);return;}
+    const data=await r.json();
+    const assistant=(data.choices&&data.choices[0]&&(data.choices[0].message?.content||data.choices[0].text))||'No response';
+    renderMessage('assistant',assistant);
+  }catch(e){renderMessage('assistant','Network error: '+(e.message||e));}
+  finally{sendBtn.disabled=false;document.getElementById('typingIndicator').style.visibility='hidden';inputEl.focus();}
+}
+sendBtn.addEventListener('click',sendMessage);
+inputEl.addEventListener('keydown',(e)=>{if(e.key==='Enter')sendMessage();});
+inputEl.focus();
+</script>
+</body>
+</html>

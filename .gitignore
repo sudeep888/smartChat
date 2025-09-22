@@ -1,0 +1,32 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment variables (keep API keys private)
+.env
+.env.local
+.env.*.local
+
+# Build output (if you ever build frontend separately)
+dist/
+build/
+out/
+
+# Logs
+logs
+*.log
+*.log.*
+debug.log
+error.log
+
+# OS junk files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor settings
+.vscode/
+.idea/
+*.swp
